@@ -2,7 +2,7 @@ package com.igniteplus.data.pipeline.Service
 
 import com.igniteplus.data.pipeline.Service.FileReaderService.readFile
 import com.igniteplus.data.pipeline.cleanser.cleanser.{convertToLowerCase, dataTypeValidation, notNullDataframe, removeDuplicates}
-import com.igniteplus.data.pipeline.constant.const.{CLICKSTREAM, ITEM, clickStreamColumnsCombination, clickStream_columns, item_column}
+import com.igniteplus.data.pipeline.constant.Constant.{CLICKSTREAM, ITEM, clickStreamColumnsCombination, clickStream_columns, item_column}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object PipelineService {
