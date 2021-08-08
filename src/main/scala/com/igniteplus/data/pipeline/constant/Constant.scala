@@ -19,8 +19,14 @@ object Constant {
   val ITEM_PRICE : String = "item_price"
   val PRODUCT_TYPE : String = "product_type"
   val DEPARTMENT_NAME : String = "department_name"
-  
 
+  
+  val OUTPUT_PATH : String = "output"
+  val FILE_TYPE : String ="csv"
+
+
+
+  //input path
   val CLICKSTREAM : String = "input02/clickstream/clickstream_log.csv"
 
   val ITEM : String = "input02/item/item_data.csv"

@@ -1,7 +1,9 @@
 package com.igniteplus.data.pipeline.cleanser
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{col, lower, to_timestamp, trim}
+import com.igniteplus.data.pipeline.Service.FileWriterService.writeFile
+import org.apache.calcite.linq4j.tree.Expressions.condition
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.apache.spark.sql.functions.{col, lower, to_timestamp, trim, when}
 
 object cleanser {
 
@@ -20,11 +22,26 @@ object cleanser {
 
   }
 
-  def notNullDataframe(df: DataFrame, col: Seq[String])(implicit spark:SparkSession): DataFrame= {
-    val dataset: DataFrame = df.na.drop(col)
-    dataset
+//  def notNullDataframe(df: DataFrame, col: Seq[String])(implicit spark:SparkSession): DataFrame= {
+//    val dataset: DataFrame = df.na.drop(col)
+//    dataset
+//
+//  }
 
-  }
+    def notNullDataframe(df: DataFrame,colNames:Seq[String],filePath:String,fileType:String)(implicit spark:SparkSession) : DataFrame=
+    {
+
+      val changedColName : Seq[Column] = colNames.map(x=>col(x))
+      val condition : Column=changedColName.map(x=>x.isNull).reduce(_ || _)
+
+      val dfChanged=df.withColumn("nullFlag",when(condition,"true").otherwise("false"))
+      val nullDf : DataFrame = dfChanged.filter("nullFlag==true")
+      val notNullDf : DataFrame = dfChanged.filter("nullFlag==false")
+      if(nullDf.count()>0)
+        writeFile(nullDf, filePath,fileType)
+
+      notNullDf
+    }
 
   def removeDuplicates(df: DataFrame,col: Seq[String])(implicit spark:SparkSession): DataFrame={
     val dataset:DataFrame=df.dropDuplicates(col)

@@ -2,17 +2,17 @@ package com.igniteplus.data.pipeline.Service
 
 import com.igniteplus.data.pipeline.Service.FileReaderService.readFile
 import com.igniteplus.data.pipeline.cleanser.cleanser.{convertToLowerCase, dataTypeValidation, notNullDataframe, removeDuplicates}
-import com.igniteplus.data.pipeline.constant.Constant.{CLICKSTREAM, ITEM, clickStreamColumnsCombination, clickStream_columns, item_column}
+import com.igniteplus.data.pipeline.constant.Constant.{CLICKSTREAM, FILE_TYPE, ITEM, OUTPUT_PATH, clickStreamColumnsCombination, clickStream_columns, item_column}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object PipelineService {
   def executePipeline()(implicit spark: SparkSession): Unit = {
 
     //###############################  READ FILES  #################################
-    val dfClickStream: DataFrame = readFile(CLICKSTREAM)
+    val dfClickStream: DataFrame = readFile(CLICKSTREAM,FILE_TYPE)
     dfClickStream.show()
 
-    val dfItem : DataFrame = readFile(ITEM)
+    val dfItem : DataFrame = readFile(ITEM,FILE_TYPE)
     dfItem.show()
 
 
@@ -36,11 +36,11 @@ object PipelineService {
 
 
     //###############################  REMOVING NULL   #############################
-    val notNullClickStream : DataFrame = notNullDataframe(dfSource,clickStream_columns)
+    val notNullClickStream : DataFrame = notNullDataframe(dfSource,clickStream_columns,OUTPUT_PATH,FILE_TYPE)
     notNullClickStream.show()
 
 
-    val notNullItem : DataFrame =notNullDataframe(dfDepartment,item_column )
+    val notNullItem : DataFrame =notNullDataframe(dfDepartment,item_column,OUTPUT_PATH ,FILE_TYPE)
     notNullItem.show()
 
 

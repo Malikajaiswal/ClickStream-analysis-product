@@ -7,23 +7,23 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object FileReaderService {
 
 
-  def readFile(doc:String)(implicit spark:SparkSession): DataFrame={
+  def readFile(path:String,fileType:String)(implicit spark:SparkSession): DataFrame={
 
 
 
     val dataset: DataFrame = try {
-      spark.read
+      spark.read.format(fileType)
         .option("header", "true")
         .option("inferSchema", "true")
-        .csv(doc)
+        .load(path)
     }catch {
-      case e: Exception => FileReadException("File Path not Found "+ s"$doc")
+      case e: Exception => FileReadException("File Path not Found "+ s"$path")
         spark.emptyDataFrame
     }
 
     val DfCount: Long=dataset.count()
     if(DfCount == 0)
-      throw FileReadException("Files not Present "+ s"$doc")
+      throw FileReadException("Files not Present "+ s"$path")
     else{
       dataset
     }
