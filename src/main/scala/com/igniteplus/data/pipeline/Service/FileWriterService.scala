@@ -7,9 +7,11 @@ object FileWriterService {
   def writeFile(df : DataFrame, filePath:String, fileType:String) : Unit =
   {
     try {
-      df.write.format(fileType)
+      df.write
+        .format(fileType)
         .option("header", "true")
         .option("sep", ",")
+        .mode("append")
         .save(filePath)
     }
     catch{

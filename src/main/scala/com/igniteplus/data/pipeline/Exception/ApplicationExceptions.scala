@@ -6,7 +6,7 @@ package com.igniteplus.data.pipeline.Exception
   }
 
   case class FileReadException (message: String) extends ApplicationExceptions(message)
-//  case class NullPointerException (message: String) extends ApplicationExceptions(message)
+
   case class FileWriteException (message: String) extends ApplicationExceptions(message)
 
 

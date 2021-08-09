@@ -1,13 +1,14 @@
 package com.igniteplus.data.pipeline.Service
 
 import com.igniteplus.data.pipeline.Exception.FileReadException
+import com.igniteplus.data.pipeline.Service.FileWriterService.writeFile
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 
 object FileReaderService {
 
 
-  def readFile(path:String,fileType:String)(implicit spark:SparkSession): DataFrame={
+  def readFile(path:String,fileType:String,outputPath:String)(implicit spark:SparkSession): DataFrame={
 
 
 
@@ -23,11 +24,10 @@ object FileReaderService {
 
     val DfCount: Long=dataset.count()
     if(DfCount == 0)
-      throw FileReadException("Files not Present "+ s"$path")
-    else{
-      dataset
-    }
+      throw FileReadException("Files content not Present "+ s"$path")
 
+    writeFile(dataset,outputPath,fileType)
+    dataset
 
 
   }

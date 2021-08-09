@@ -7,16 +7,20 @@ import org.apache.spark.sql.functions.{col, lower, to_timestamp, trim, when}
 
 object cleanser {
 
-  def dataTypeValidation(df: DataFrame)(implicit spark: SparkSession): DataFrame = {
+  def dataTypeValidation(df: DataFrame, filePath:String,fileType:String)(implicit spark: SparkSession): DataFrame = {
 
     val dfRenamed: DataFrame = df
       .withColumn("event_Timestamp", to_timestamp(col("event_timestamp"),"MM/dd/yyyy H:mm").cast("timestamp"))
 
+    writeFile(dfRenamed, filePath,fileType)
     dfRenamed //return dataset
   }
 
-  def convertToLowerCase(df: DataFrame, columnName:String)(implicit spark: SparkSession): DataFrame ={
-    val dataset : DataFrame = df.withColumn(columnName , lower(col(columnName)))
+  def convertToLowerCase(df: DataFrame, columnName:Seq[String],filePath:String,fileType:String)(implicit spark: SparkSession): DataFrame ={
+    var dataset : DataFrame = df
+    for (n <- columnName)  dataset = dataset.withColumn(n, lower(col(n)))
+
+    writeFile(dataset, filePath,fileType)
 
     dataset
 
@@ -28,10 +32,10 @@ object cleanser {
 //
 //  }
 
-    def notNullDataframe(df: DataFrame,colNames:Seq[String],filePath:String,fileType:String)(implicit spark:SparkSession) : DataFrame=
+    def notNullDataframe(df: DataFrame,primaryColumn:Seq[String],filePath:String,fileType:String)(implicit spark:SparkSession) : DataFrame=
     {
 
-      val changedColName : Seq[Column] = colNames.map(x=>col(x))
+      val changedColName : Seq[Column] = primaryColumn.map(x=>col(x))
       val condition : Column=changedColName.map(x=>x.isNull).reduce(_ || _)
 
       val dfChanged=df.withColumn("nullFlag",when(condition,"true").otherwise("false"))
@@ -45,7 +49,9 @@ object cleanser {
 
   def removeDuplicates(df: DataFrame,col: Seq[String])(implicit spark:SparkSession): DataFrame={
     val dataset:DataFrame=df.dropDuplicates(col)
+//    writeFile(dfRenamed, filePath,fileType)
     dataset
+
 
   }
 
@@ -53,6 +59,7 @@ object cleanser {
   def trimColumn(df:DataFrame,column:Seq[String]):DataFrame = {
     var trimmedDF: DataFrame = df
     for(n<-column) trimmedDF = df.withColumn(n, trim(col(n)))
+//    writeFile(dfRenamed, filePath,fileType)
     trimmedDF
   }
 
