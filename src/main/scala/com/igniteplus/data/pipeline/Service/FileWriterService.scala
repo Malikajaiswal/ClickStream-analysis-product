@@ -11,7 +11,7 @@ object FileWriterService {
         .format(fileType)
         .option("header", "true")
         .option("sep", ",")
-        .mode("append")
+        .mode("overwrite")
         .save(filePath)
     }
     catch{

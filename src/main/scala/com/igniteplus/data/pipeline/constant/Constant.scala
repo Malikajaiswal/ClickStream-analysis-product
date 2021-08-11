@@ -21,10 +21,6 @@ object Constant {
   val DEPARTMENT_NAME : String = "department_name"
 
 
-
-
-
-
   val FILE_TYPE : String ="csv"
 
   //input path
@@ -44,12 +40,14 @@ object Constant {
 
   //primary key
   val clickStream_columns: Seq[String] = Seq(SESSION_ID, VISITOR_ID )
-  val clickStreamColumnsCombination: Seq[String] = Seq(SESSION_ID, VISITOR_ID, ITEM_ID, EVENT_TIMESTAMP)
+  val clickStreamColumnsCombination: Seq[String] = Seq(SESSION_ID, ITEM_ID)
   val item_column: Seq[String] = Seq(ITEM_ID)
 
   //to lower
   val clickStream_columns_lower: Seq[String]= Seq(REDIRECTION_SOURCE ,DEVICE_TYPE )
   val item_columns_lower: Seq[String]= Seq(DEPARTMENT_NAME)
 
-
+  //to trim
+  val clickStream_trim_columns: Seq[String] = Seq(SESSION_ID, VISITOR_ID,DEVICE_TYPE,REDIRECTION_SOURCE,ITEM_ID ,EVENT_TIMESTAMP )
+  val item_trim_columns: Seq[String] = Seq(DEPARTMENT_NAME)
 }

@@ -1,9 +1,9 @@
 package com.igniteplus.data.pipeline.cleanser
 
 import com.igniteplus.data.pipeline.Service.FileWriterService.writeFile
-import org.apache.calcite.linq4j.tree.Expressions.condition
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{col, lower, to_timestamp, trim, when}
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.{col, desc, lower, row_number, to_timestamp, trim, when}
 
 object cleanser {
 
@@ -35,22 +35,43 @@ object cleanser {
     def notNullDataframe(df: DataFrame,primaryColumn:Seq[String],filePath:String,fileType:String)(implicit spark:SparkSession) : DataFrame=
     {
 
-      val changedColName : Seq[Column] = primaryColumn.map(x=>col(x))
-      val condition : Column=changedColName.map(x=>x.isNull).reduce(_ || _)
+//      val changedColName : Seq[Column] = primaryColumn.map(x=>col(x))
+//      val condition : Column=changedColName.map(x=>x.isNull).reduce(_ || _)
+//
+//      val dfChanged=df.withColumn("nullFlag",when(condition,"true").otherwise("false"))
+//      val nullDf : DataFrame = dfChanged.filter("nullFlag==true")
+//      val notNullDf : DataFrame = dfChanged.filter("nullFlag==false")
+//      if(nullDf.count()>0)
+//        writeFile(nullDf, filePath,fileType)
+//
+//      notNullDf
 
-      val dfChanged=df.withColumn("nullFlag",when(condition,"true").otherwise("false"))
-      val nullDf : DataFrame = dfChanged.filter("nullFlag==true")
-      val notNullDf : DataFrame = dfChanged.filter("nullFlag==false")
-      if(nullDf.count()>0)
-        writeFile(nullDf, filePath,fileType)
-
+      var nullDf : DataFrame = df
+      val notNullDf : DataFrame = df.na.drop(primaryColumn)
+      for( i <- primaryColumn)
+      {
+        nullDf = df.filter(df(i).isNull)
+//        notNullDf = df.filter(df(i).isNotNull)
+      }
+      if(nullDf.count() > 0)
+        writeFile(nullDf, filePath,fileType )
       notNullDf
     }
 
-  def removeDuplicates(df: DataFrame,col: Seq[String])(implicit spark:SparkSession): DataFrame={
-    val dataset:DataFrame=df.dropDuplicates(col)
+  def removeDuplicates(df: DataFrame,primaryColumn: Seq[String],orderByColumn: String)(implicit spark:SparkSession): DataFrame={
+    if( orderByColumn != null) {
+      val windowSpec = Window.partitionBy(primaryColumn.map(col):_* ).orderBy(desc(orderByColumn))
+      val dfDropDuplicate: DataFrame = df.withColumn(colName ="row_number", row_number().over(windowSpec))
+        .filter(conditionExpr = "row_number == 1" ).drop("row_number")
+      dfDropDuplicate
+    }
+    else {
+      val dropDuplicateItem = df.dropDuplicates(primaryColumn)
+      dropDuplicateItem
+    }
+
 //    writeFile(dfRenamed, filePath,fileType)
-    dataset
+
 
 
   }
@@ -59,7 +80,7 @@ object cleanser {
   def trimColumn(df:DataFrame,column:Seq[String]):DataFrame = {
     var trimmedDF: DataFrame = df
     for(n<-column) trimmedDF = df.withColumn(n, trim(col(n)))
-//    writeFile(dfRenamed, filePath,fileType)
+
     trimmedDF
   }
 
