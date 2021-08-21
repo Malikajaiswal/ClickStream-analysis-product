@@ -20,7 +20,8 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-library" % scalaVersion.value,
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonCore % scope,
   //logging library
-  "org.slf4j" % "slf4j-api" % "1.7.29",
+//  "org.slf4j" % "slf4j-api" % "1.7.29",
   //for doing testing
-  "org.scalatest" %% "scalatest" % "3.1.0" % Test
+
+  "org.scalatest" %% "scalatest" % "3.1.0" % "test"
 )

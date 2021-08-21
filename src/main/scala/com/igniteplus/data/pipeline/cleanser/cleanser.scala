@@ -3,7 +3,7 @@ package com.igniteplus.data.pipeline.cleanser
 import com.igniteplus.data.pipeline.Service.FileWriterService.writeFile
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{col, desc, lower, row_number, to_timestamp, trim, when}
+import org.apache.spark.sql.functions.{col, desc, lower, row_number, to_timestamp, trim}
 
 object cleanser {
 
@@ -26,37 +26,37 @@ object cleanser {
 
   }
 
-//  def notNullDataframe(df: DataFrame, col: Seq[String])(implicit spark:SparkSession): DataFrame= {
-//    val dataset: DataFrame = df.na.drop(col)
-//    dataset
-//
-//  }
+  //  def notNullDataframe(df: DataFrame, col: Seq[String])(implicit spark:SparkSession): DataFrame= {
+  //    val dataset: DataFrame = df.na.drop(col)
+  //    dataset
+  //
+  //  }
 
-    def notNullDataframe(df: DataFrame,primaryColumn:Seq[String],filePath:String,fileType:String)(implicit spark:SparkSession) : DataFrame=
+  def notNullDataframe(df: DataFrame,primaryColumn:Seq[String],filePath:String,fileType:String)(implicit spark:SparkSession) : DataFrame=
+  {
+
+    //      val changedColName : Seq[Column] = primaryColumn.map(x=>col(x))
+    //      val condition : Column=changedColName.map(x=>x.isNull).reduce(_ || _)
+    //
+    //      val dfChanged=df.withColumn("nullFlag",when(condition,"true").otherwise("false"))
+    //      val nullDf : DataFrame = dfChanged.filter("nullFlag==true")
+    //      val notNullDf : DataFrame = dfChanged.filter("nullFlag==false")
+    //      if(nullDf.count()>0)
+    //        writeFile(nullDf, filePath,fileType)
+    //
+    //      notNullDf
+
+    var nullDf : DataFrame = df
+    val notNullDf : DataFrame = df.na.drop(primaryColumn)
+    for( i <- primaryColumn)
     {
-
-//      val changedColName : Seq[Column] = primaryColumn.map(x=>col(x))
-//      val condition : Column=changedColName.map(x=>x.isNull).reduce(_ || _)
-//
-//      val dfChanged=df.withColumn("nullFlag",when(condition,"true").otherwise("false"))
-//      val nullDf : DataFrame = dfChanged.filter("nullFlag==true")
-//      val notNullDf : DataFrame = dfChanged.filter("nullFlag==false")
-//      if(nullDf.count()>0)
-//        writeFile(nullDf, filePath,fileType)
-//
-//      notNullDf
-
-      var nullDf : DataFrame = df
-      val notNullDf : DataFrame = df.na.drop(primaryColumn)
-      for( i <- primaryColumn)
-      {
-        nullDf = df.filter(df(i).isNull)
-//        notNullDf = df.filter(df(i).isNotNull)
-      }
-      if(nullDf.count() > 0)
-        writeFile(nullDf, filePath,fileType )
-      notNullDf
+      nullDf = df.filter(df(i).isNull)
+      //        notNullDf = df.filter(df(i).isNotNull)
     }
+    if(nullDf.count() > 0)
+      writeFile(nullDf, filePath,fileType )
+    notNullDf
+  }
 
   def removeDuplicates(df: DataFrame,primaryColumn: Seq[String],orderByColumn: String)(implicit spark:SparkSession): DataFrame={
     if( orderByColumn != null) {
@@ -70,7 +70,7 @@ object cleanser {
       dropDuplicateItem
     }
 
-//    writeFile(dfRenamed, filePath,fileType)
+    //    writeFile(dfRenamed, filePath,fileType)
 
 
 

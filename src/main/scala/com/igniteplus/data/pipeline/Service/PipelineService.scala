@@ -1,17 +1,19 @@
 package com.igniteplus.data.pipeline.Service
 
-import com.igniteplus.data.pipeline.Service.FileReaderService.readFile
 import com.igniteplus.data.pipeline.cleanser.cleanser.{convertToLowerCase, dataTypeValidation, notNullDataframe, removeDuplicates, trimColumn}
+import com.igniteplus.data.pipeline.Service.FileReaderService.readFile
 import com.igniteplus.data.pipeline.constant.Constant.{CLICKSTREAM, CLICKSTREAM_DATA_VALIDATION, CLICKSTREAM_LOWER, DEPARTMENT_LOWER, EVENT_TIMESTAMP, FILE_TYPE, ITEM, OUTPUT_PATH_CLICKSTREAM, OUTPUT_PATH_ITEM, clickStreamColumnsCombination, clickStream_columns, clickStream_columns_lower, clickStream_trim_columns, clickstream_data_path, item_column, item_columns_lower, item_data_path, item_trim_columns}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object PipelineService {
+
   def executePipeline()(implicit spark: SparkSession): Unit = {
 
     //###############################  READ FILES  #################################
     val dfClickStream: DataFrame = readFile(CLICKSTREAM,FILE_TYPE,clickstream_data_path)
+    dfClickStream.show()
     val dfItem : DataFrame = readFile(ITEM,FILE_TYPE,item_data_path)
-
+    dfItem.show()
 
     //###############################  TRIM FILES  #################################
     val dfTrimClickStream : DataFrame = trimColumn(dfClickStream,clickStream_trim_columns)
@@ -20,7 +22,7 @@ object PipelineService {
 
     //###############################  CORRECT DATATYPE  ###########################
     val dfDatatype: DataFrame = dataTypeValidation(dfTrimClickStream,CLICKSTREAM_DATA_VALIDATION,FILE_TYPE)
-
+    dfDatatype.show()
 
 
 
