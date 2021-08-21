@@ -1,4 +1,4 @@
-package com.igniteplus.data.pipeline
+package com.igniteplus.data.pipeline.cleanser
 
 import com.igniteplus.data.pipeline.Service.FileReaderService.readFile
 import com.igniteplus.data.pipeline.TestConstant.constant.{FORMAT, OUTPUT_PATH, PRIMARY_KEY, TEST_DATA_SAMPLE}
